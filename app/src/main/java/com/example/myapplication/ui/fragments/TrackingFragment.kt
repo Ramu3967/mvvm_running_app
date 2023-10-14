@@ -7,7 +7,6 @@ import com.example.myapplication.ui.viewmodels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class RunFragment : Fragment(R.layout.fragment_run){
-
-    private val viewModel: MainViewModel by viewModels()
+class TrackingFragment : Fragment(R.layout.fragment_tracking){
+    private val viewModel by viewModels<MainViewModel>()
 }
