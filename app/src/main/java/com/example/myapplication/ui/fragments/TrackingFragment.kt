@@ -1,14 +1,16 @@
 package com.example.myapplication.ui.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.example.myapplication.R
 import com.example.myapplication.databinding.FragmentTrackingBinding
+import com.example.myapplication.services.TrackingService
 import com.example.myapplication.ui.viewmodels.MainViewModel
+import com.example.myapplication.util.RunConstants.ACTION_START_OR_RESUME_SERVICE
 import com.google.android.gms.maps.GoogleMap
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -33,6 +35,9 @@ class TrackingFragment : Fragment(){
         binding.apply {
             mapView.getMapAsync { map=it }
             mapView.onCreate(savedInstanceState)
+            btnToggleRun.setOnClickListener{
+                sendCommandToService(ACTION_START_OR_RESUME_SERVICE)
+            }
         }
     }
 
@@ -65,6 +70,13 @@ class TrackingFragment : Fragment(){
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         binding.mapView.onSaveInstanceState(outState)
+    }
+
+    // it doesn't really start a new service every time we call this function, but it just sends intents to it.
+    private fun sendCommandToService(action:String)= Intent(requireContext(),TrackingService::class.java).
+    also {
+        it.action=action
+        requireContext().startService(it)
     }
 
 }

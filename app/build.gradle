@@ -96,6 +96,7 @@ dependencies {
 //    implementation 'android.arch.lifecycle:extensions:1.1.1'
 
     implementation "androidx.fragment:fragment-ktx:1.6.1"
+    implementation "androidx.lifecycle:lifecycle-service:2.6.2"
 
 }
 kapt {
