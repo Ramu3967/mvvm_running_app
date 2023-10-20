@@ -3,9 +3,11 @@ package com.example.myapplication.util
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Build
 import android.view.View
 import androidx.core.content.ContextCompat
+import pub.devrel.easypermissions.EasyPermissions
 
 object RunConstants {
     const val DATABASE_NAME = "database_running"
@@ -22,19 +24,17 @@ object RunConstants {
     const val CHANNEL_ID = "id_foreground_service"
     const val NOTIFICATION_ID = 1
 
-    const val LOCATION_INTERVAL=10000L
-    const val LOCATION_FASTEST_INTERVAL = 5000L
-    const val LOCATION_MAX_WAIT_TIME = 20000L
+    const val LOCATION_INTERVAL=2000L
+    const val LOCATION_FASTEST_INTERVAL = 1000L
+    const val LOCATION_MAX_WAIT_TIME = 10000L
     const val LOCATION_PERMISSION_REQUEST_CODE = 911
 
-    val locationPermissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) arrayOf(
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.ACCESS_BACKGROUND_LOCATION
-    ) else arrayOf(
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.ACCESS_FINE_LOCATION)
+    const val POLYLINE_WIDTH = 8f
+    const val POLYLINE_COLOR = Color.BLACK
+    const val POLYLINE_CAMERA_ZOOM = 16f
 
+    val locationPermissions= mutableListOf(Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION)
+        .apply {if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)}.toTypedArray()
 
     fun View.show(){this.visibility=View.VISIBLE}
     fun View.remove(){this.visibility=View.GONE}
@@ -44,4 +44,22 @@ object RunConstants {
     fun Context.hasLocationPermissions() = locationPermissions.all {
         ContextCompat.checkSelfPermission(this,it) == PackageManager.PERMISSION_GRANTED
     }
+
+    fun Context.hasLocationPerm()=EasyPermissions.hasPermissions(this, *locationPermissions)
+
+    fun formatMillisToMinutesSeconds(milliseconds: Long): String {
+        val minutes = (milliseconds / (1000 * 60)) % 60
+        val seconds = (milliseconds / 1000) % 60
+
+        return String.format("%02d:%02d", minutes, seconds)
+    }
+
+    fun formatMillisToHoursMinutesSecondsMilliseconds(milliseconds: Long): String {
+        val hours = (milliseconds / (1000 * 60 * 60)) % 24
+        val minutes = (milliseconds / (1000 * 60)) % 60
+        val seconds = (milliseconds / 1000) % 60
+        val millisecondsRemainder = milliseconds % 1000
+        return String.format("%02d:%02d:%02d:%03d", hours, minutes, seconds, millisecondsRemainder)
+    }
 }
+

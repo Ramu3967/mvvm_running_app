@@ -29,6 +29,7 @@ import com.example.myapplication.util.RunConstants.LOCATION_FASTEST_INTERVAL
 import com.example.myapplication.util.RunConstants.LOCATION_INTERVAL
 import com.example.myapplication.util.RunConstants.LOCATION_MAX_WAIT_TIME
 import com.example.myapplication.util.RunConstants.NOTIFICATION_ID
+import com.example.myapplication.util.RunConstants.formatMillisToMinutesSeconds
 import com.example.myapplication.util.RunConstants.hasLocationPermissions
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -49,6 +50,9 @@ class TrackingService : LifecycleService() {
     private var isFirstRun = true
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
+//    // used by the notification of the service
+    private var timerInSeconds = MutableStateFlow("")
+
     private val locationCallback= object : LocationCallback() {
         override fun onLocationResult(result: LocationResult) {
             super.onLocationResult(result)
@@ -67,11 +71,14 @@ class TrackingService : LifecycleService() {
         }
     }
 
+    // instead of onBind, the components bound to service use these
     companion object{
         // tells the observers whether the service is tracking the location or not
         val isTracking = MutableStateFlow(false)
         //val pathPoints = MutableLiveData<MutableList<MutableList<LatLng>>>()
         val pathPoints = MutableLiveData<Polylines>()
+        // will be observed by the fragment
+        val timerInMillis = MutableStateFlow(0L)
     }
 
     override fun onCreate() {
@@ -90,20 +97,31 @@ class TrackingService : LifecycleService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         intent?.let {
             when(it.action){
-                ACTION_STOP_SERVICE-> Log.d(TAG, "stop service")
+                ACTION_STOP_SERVICE-> {
+                    isTracking.value=false
+                    stopSelf()
+                    Log.d(TAG, "stop service")
+                }
                 ACTION_START_OR_RESUME_SERVICE -> {
                     if(isFirstRun) {
                         startForegroundService()
                         isFirstRun=false
                     }
-                    else Log.d(TAG, "service is running already")
+                    else{
+                        startTimer()
+                        Log.d(TAG, "service is running already")
+                    }
                 }
-                ACTION_PAUSE_SERVICE -> Log.d(TAG, "service paused")
+                ACTION_PAUSE_SERVICE -> {
+                    pauseService()
+                    Log.d(TAG, "service is paused")
+                }
                 else-> Log.d(TAG, "NONE")
             }
         }
         return super.onStartCommand(intent, flags, startId)
     }
+
 
     override fun onDestroy() {
         super.onDestroy()
@@ -112,9 +130,8 @@ class TrackingService : LifecycleService() {
     }
 
     private fun startForegroundService(){
-        addEmptyPolyline()
         isTracking.value=true
-
+        startTimer()
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         createNotificationChannel(notificationManager)
         val notificationBuilder=NotificationCompat.Builder(this, CHANNEL_ID)
@@ -128,6 +145,11 @@ class TrackingService : LifecycleService() {
         startForeground(NOTIFICATION_ID,notificationBuilder.build())
     }
 
+    private fun pauseService() {
+        isTracking.value=false
+        isTimerEnabled=false
+    }
+
     private fun getMainActivityPendingIntent():PendingIntent{
         val intent = Intent(this,MainActivity::class.java).also { it.action = ACTION_TRACKING_FRAGMENT }
         // this flag is used to update the current intent if it already exists
@@ -138,6 +160,8 @@ class TrackingService : LifecycleService() {
     private fun postInitialValues(){
         pathPoints.postValue(mutableListOf())
         isTracking.value=false
+        timerInMillis.value=(0L)
+        timerInSeconds.value=""
     }
 
     private fun addEmptyPolyline()= pathPoints.value?.apply {
@@ -173,11 +197,12 @@ class TrackingService : LifecycleService() {
     }
 
     private fun requestLocationPermissions(){
-        if(!hasLocationPermissions()){
-            // an activity which can give us the activity context for requesting permissions
-            startActivity(Intent(this,PermissionsActivity::class.java)
-                .also { it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) })
-        }
+//        if(!hasLocationPermissions()){
+//            // an activity which can give us the activity context for requesting permissions
+//            startActivity(Intent(this,PermissionsActivity::class.java)
+//                .also { it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) })
+//        }
+
     }
 
     private fun createNotificationChannel(notificationManager: NotificationManager){
@@ -187,6 +212,33 @@ class TrackingService : LifecycleService() {
                 CHANNEL_NAME,
                 NotificationManager.IMPORTANCE_LOW
             ).also {notificationManager.createNotificationChannel(it)}
+        }
+    }
+
+    private var isTimerEnabled = false
+    private var totalRunTime = 0L
+    private var lapTime = 0L // time for each polyline run
+    private var timeStarted = 0L
+    private var secondsPassed = 0L
+
+    private fun startTimer(){
+        // moved from startForegroundService(), because you start a timer only when its a new run or after being paused, this is when we need an empty polyline
+        addEmptyPolyline()
+        isTracking.value = true
+        isTimerEnabled=true
+        timeStarted = System.currentTimeMillis()
+
+        lifecycleScope.launch(Dispatchers.Default) {
+            while (isTracking.value){
+                lapTime = System.currentTimeMillis() - timeStarted
+                timerInMillis.value = (lapTime+totalRunTime)
+                // updates every second
+                if (secondsPassed + 1000L <= timerInMillis.value){
+                    secondsPassed+=1000L
+                    timerInSeconds.value=formatMillisToMinutesSeconds(timerInMillis.value)
+                }
+            }
+            totalRunTime+=lapTime
         }
     }
 }
