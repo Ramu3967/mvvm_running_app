@@ -3,6 +3,7 @@ package com.example.myapplication.di
 import android.content.Context
 import androidx.room.Room
 import com.example.myapplication.db.RunningDatabase
+import com.example.myapplication.util.RunConstants.DATABASE_NAME
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,7 +21,7 @@ object ModuleApplication {
         Room.databaseBuilder(
             context,
             RunningDatabase::class.java,
-            "database_running"
+            DATABASE_NAME
         ).build()
 
     @Provides
