@@ -4,9 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.myapplication.adapters.RunAdapter
 import com.example.myapplication.databinding.FragmentRunBinding
 import com.example.myapplication.ui.viewmodels.MainViewModel
 import com.example.myapplication.util.RunConstants
@@ -20,6 +24,7 @@ class RunFragment : Fragment(), EasyPermissions.PermissionCallbacks{
 
     private lateinit var binding:FragmentRunBinding
     private val viewModel: MainViewModel by viewModels()
+    private val runAdapter by lazy { RunAdapter(emptyList()) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,6 +43,37 @@ class RunFragment : Fragment(), EasyPermissions.PermissionCallbacks{
             }
         }
         requestPerms()
+        binding.rvRuns.apply {
+            adapter=runAdapter
+            layoutManager=LinearLayoutManager(requireContext(),RecyclerView.VERTICAL,false)
+        }
+        observeLiveData()
+
+        binding.spFilter.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            override fun onItemSelected(p0: AdapterView<*>?, view: View?, pos: Int, id: Long) {
+                handleSorting(pos)
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+            }
+        }
+    }
+
+    private fun observeLiveData() {
+        viewModel.runLiveData.observe(viewLifecycleOwner){runAdapter.submitList(it)}
+    }
+
+    private fun handleSorting(pos: Int) {
+        viewModel.apply {
+            // maintain this order
+            when(pos){
+                0 -> switchSortingStrategy(RunConstants.SortingOptions.DATE)
+                1 -> switchSortingStrategy(RunConstants.SortingOptions.TIME)
+                2 -> switchSortingStrategy(RunConstants.SortingOptions.DISTANCE)
+                3 -> switchSortingStrategy(RunConstants.SortingOptions.AVG_SPEED)
+                4 -> switchSortingStrategy(RunConstants.SortingOptions.CALORIES)
+            }
+        }
     }
 
     private fun requestPerms(){

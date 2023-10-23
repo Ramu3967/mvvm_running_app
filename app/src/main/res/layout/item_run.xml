@@ -7,7 +7,7 @@
     android:padding="8dp">
 
     <ImageView
-        android:id="@+id/ivRunImage"
+        android:id="@+id/iv_run_image"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
@@ -16,58 +16,63 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/tvDate"
+        android:id="@+id/tv_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="DATE"
-        app:layout_constraintEnd_toStartOf="@+id/tvTime"
+        android:textColor="@color/text_color"
+        app:layout_constraintEnd_toStartOf="@+id/tv_time"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ivRunImage" />
+        app:layout_constraintTop_toBottomOf="@+id/iv_run_image" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/tvTime"
+        android:id="@+id/tv_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="TIME"
-        app:layout_constraintEnd_toStartOf="@+id/tvDistance"
+        android:textColor="@color/text_color"
+        app:layout_constraintEnd_toStartOf="@+id/tv_distance"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/tvDate"
-        app:layout_constraintTop_toBottomOf="@+id/ivRunImage" />
+        app:layout_constraintStart_toEndOf="@+id/tv_date"
+        app:layout_constraintTop_toBottomOf="@+id/iv_run_image" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/tvDistance"
+        android:id="@+id/tv_distance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="DISTANCE"
-        app:layout_constraintEnd_toStartOf="@+id/tvAvgSpeed"
+        android:textColor="@color/text_color"
+        app:layout_constraintEnd_toStartOf="@+id/tv_avg_speed"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/tvTime"
-        app:layout_constraintTop_toBottomOf="@+id/ivRunImage" />
+        app:layout_constraintStart_toEndOf="@+id/tv_time"
+        app:layout_constraintTop_toBottomOf="@+id/iv_run_image" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/tvAvgSpeed"
+        android:id="@+id/tv_avg_speed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="AVGSPEED"
-        app:layout_constraintEnd_toStartOf="@+id/tvCalories"
+        android:textColor="@color/text_color"
+        app:layout_constraintEnd_toStartOf="@+id/tv_calories"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/tvDistance"
-        app:layout_constraintTop_toBottomOf="@+id/ivRunImage" />
+        app:layout_constraintStart_toEndOf="@+id/tv_distance"
+        app:layout_constraintTop_toBottomOf="@+id/iv_run_image" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/tvCalories"
+        android:id="@+id/tv_calories"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="CALORIES"
+        android:textColor="@color/text_color"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/tvAvgSpeed"
-        app:layout_constraintTop_toBottomOf="@+id/ivRunImage" />
+        app:layout_constraintStart_toEndOf="@+id/tv_avg_speed"
+        app:layout_constraintTop_toBottomOf="@+id/iv_run_image" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
