@@ -7,8 +7,11 @@ import android.graphics.Color
 import android.location.Location
 import android.os.Build
 import android.view.View
+import android.widget.EditText
 import androidx.core.content.ContextCompat
 import com.example.myapplication.services.Polyline
+import com.example.myapplication.util.RunConstants.enable
+import com.google.android.material.textfield.TextInputEditText
 import pub.devrel.easypermissions.EasyPermissions
 
 object RunConstants {
@@ -36,6 +39,13 @@ object RunConstants {
     const val POLYLINE_COLOR = Color.BLACK
     const val POLYLINE_CAMERA_ZOOM = 16f
 
+    const val PREF_MY_APP = "com.example.myapplication.util.MY_APP"
+    const val PREF_USER_NAME = "com.example.myapplication.util.PREF_NAME"
+    const val PREF_WEIGHT = "com.example.myapplication.util.PREF_WEIGHT"
+    const val PREF_FIRST_TIME = "com.example.myapplication.util.PREF_FIRST_TIME"
+
+    const val EMPTY_STRING = ""
+
     val locationPermissions= mutableListOf(Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION)
         .apply {if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)}.toTypedArray()
 
@@ -44,6 +54,8 @@ object RunConstants {
     fun View.show(){this.visibility=View.VISIBLE}
     fun View.remove(){this.visibility=View.GONE}
     fun View.hide(){this.visibility=View.INVISIBLE}
+    fun View.enable(){this.isEnabled=true}
+    fun View.disable(){this.isEnabled=false}
 
 
     fun Context.hasLocationPermissions() = locationPermissions.all {

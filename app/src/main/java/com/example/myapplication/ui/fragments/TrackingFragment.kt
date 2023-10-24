@@ -1,10 +1,9 @@
 package com.example.myapplication.ui.fragments
 
 import android.content.Intent
-import android.graphics.Bitmap
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,13 +21,14 @@ import com.example.myapplication.util.RunConstants
 import com.example.myapplication.util.RunConstants.ACTION_PAUSE_SERVICE
 import com.example.myapplication.util.RunConstants.ACTION_START_OR_RESUME_SERVICE
 import com.example.myapplication.util.RunConstants.ACTION_STOP_SERVICE
-import com.example.myapplication.util.RunConstants.DELAY_STOP_SERVICE
 import com.example.myapplication.util.RunConstants.POLYLINE_CAMERA_ZOOM
 import com.example.myapplication.util.RunConstants.POLYLINE_COLOR
 import com.example.myapplication.util.RunConstants.POLYLINE_WIDTH
+import com.example.myapplication.util.RunConstants.PREF_WEIGHT
 import com.example.myapplication.util.RunConstants.getPolylineLength
 import com.example.myapplication.util.RunConstants.remove
 import com.example.myapplication.util.RunConstants.show
+import com.google.android.gms.maps.CameraUpdate
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
@@ -36,24 +36,23 @@ import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.lang.Math.round
 import java.util.Calendar
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class TrackingFragment : Fragment(){
     private lateinit var binding:FragmentTrackingBinding
     private val viewModel by viewModels<MainViewModel>()
-    // this is the actual map and mapView represents it.
 
-    private var isTracking=false
+    @Inject
+    lateinit var appPreferences: SharedPreferences
+
     private var pathPoints = mutableListOf(mutableListOf<LatLng>())
+    private var isTracking=false
+    // this is the actual map and mapView represents it.
     private var map:GoogleMap? = null
-    private var weight = 65
-
     private var currentTimeInMillis = 0L
 
     override fun onCreateView(
@@ -203,13 +202,17 @@ class TrackingFragment : Fragment(){
         for(polyline in pathPoints)
             for(pos in polyline)
                 bounds.include(pos)
-        val cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds.build(),100 )
-//        binding.mapView.width,binding.mapView.height,(binding.mapView.height*0.5f).toInt()
-        map?.animateCamera(cameraUpdate)
+
+        try {
+            map?.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds.build(),binding.mapView.width,binding.mapView.height,(binding.mapView.height*0.5f).toInt() ))
+        }catch (e:Exception){
+            map?.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds.build(),300 ))
+        }
     }
 
     private fun endRunAndSaveDb(){
         zoomOutForEntirePath()
+        val weight : Int =  appPreferences.getString(PREF_WEIGHT,"")?.toInt() ?: 65
         map?.snapshot {
             var distanceInMeters = 0
             for(polyline in pathPoints) distanceInMeters+= getPolylineLength(polyline).toInt()

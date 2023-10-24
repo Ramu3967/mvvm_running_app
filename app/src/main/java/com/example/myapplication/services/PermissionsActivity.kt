@@ -1,13 +1,8 @@
 package com.example.myapplication.services
 
 import android.content.Intent
-import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
-import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.myapplication.R
 import com.example.myapplication.util.RunConstants.ACTION_LOCATION_PERMISSION

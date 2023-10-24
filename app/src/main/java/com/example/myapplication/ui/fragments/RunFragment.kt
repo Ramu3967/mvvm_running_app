@@ -18,10 +18,12 @@ import com.example.myapplication.util.RunConstants.hasLocationPerm
 import dagger.hilt.android.AndroidEntryPoint
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class RunFragment : Fragment(), EasyPermissions.PermissionCallbacks{
-
+    @Inject
+    lateinit var locationPermissions:Array<String>
     private lateinit var binding:FragmentRunBinding
     private val viewModel: MainViewModel by viewModels()
     private val runAdapter by lazy { RunAdapter(emptyList()) }
@@ -53,9 +55,7 @@ class RunFragment : Fragment(), EasyPermissions.PermissionCallbacks{
             override fun onItemSelected(p0: AdapterView<*>?, view: View?, pos: Int, id: Long) {
                 handleSorting(pos)
             }
-
-            override fun onNothingSelected(p0: AdapterView<*>?) {
-            }
+            override fun onNothingSelected(p0: AdapterView<*>?) {}
         }
     }
 
@@ -78,7 +78,7 @@ class RunFragment : Fragment(), EasyPermissions.PermissionCallbacks{
 
     private fun requestPerms(){
         if(!requireContext().hasLocationPerm()) EasyPermissions.requestPermissions(this,"accept the permissions",
-            RunConstants.LOCATION_PERMISSION_REQUEST_CODE,*RunConstants.locationPermissions
+            RunConstants.LOCATION_PERMISSION_REQUEST_CODE,*locationPermissions
         )
     }
 
