@@ -39,4 +39,7 @@ interface RunDao {
     // get the raw data as they are added in the db
     @Query("select * from table_run where id = :id")
     fun getRuns(id:Int): List<Run>
+
+    @Query("select avg(avgSpeedInKmh) as avgSpeedInKmh,sum(distanceInMeters) as distanceInMeters,sum(timeInMillis) as timeInMillis,sum(caloriesBurned) as caloriesBurned, 0 as timestamp from table_run")
+    fun getSummary():Flow<Run>
 }

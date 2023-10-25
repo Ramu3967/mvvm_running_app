@@ -14,7 +14,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-class RunAdapter(private var runs:List<Run>) : RecyclerView.Adapter<RunAdapter.RunViewHolder>() {
+class RunAdapter(private var runs:List<Run>,var lambdaDelete:(Run)->Unit) : RecyclerView.Adapter<RunAdapter.RunViewHolder>() {
     inner class RunViewHolder(itemView: View) : ViewHolder(itemView)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RunViewHolder {
@@ -43,6 +43,11 @@ class RunAdapter(private var runs:List<Run>) : RecyclerView.Adapter<RunAdapter.R
 
             val caloriesBurned = "${run.caloriesBurned}Kcal"
             findViewById<MaterialTextView>(R.id.tv_calories).text = caloriesBurned
+
+            setOnLongClickListener{
+                lambdaDelete(run)
+                true
+            }
         }
     }
 

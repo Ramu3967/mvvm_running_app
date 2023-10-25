@@ -30,4 +30,6 @@ class MainRepository @Inject constructor(
     fun getTotalTimeInMillis()=runDao.getTotalTimeInMillis()
 
     fun getRunsWithId(id:Int)=runDao.getRuns(id)
+
+    fun getSummary()=runDao.getSummary()
 }

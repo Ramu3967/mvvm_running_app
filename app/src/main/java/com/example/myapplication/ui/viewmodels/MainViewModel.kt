@@ -2,7 +2,6 @@ package com.example.myapplication.ui.viewmodels
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.db.Run
@@ -49,6 +48,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
+
     private fun getCurrentSource() = when(runLiveData.value){
         runsByDate.value -> {runsByDate}
         runsByTime.value -> {runsByTime}
@@ -57,4 +57,8 @@ class MainViewModel @Inject constructor(
         runsByCalories.value -> {runsByCalories}
         else-> runsByDate
     }
+
+    fun deleteRun(run: Run)=viewModelScope.launch { mainRepository.deleteRun(run)}
+
+
 }

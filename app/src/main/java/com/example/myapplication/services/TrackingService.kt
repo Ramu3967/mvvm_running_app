@@ -138,7 +138,6 @@ class TrackingService : LifecycleService() {
         return super.onStartCommand(intent, flags, startId)
     }
 
-
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(receiver)

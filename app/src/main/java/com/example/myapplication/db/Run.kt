@@ -12,7 +12,7 @@ data class Run(
     var distanceInMeters: Int=0,
     var timeInMillis:Long=0L,
     var caloriesBurned : Int = 0
-) {
+){
     @PrimaryKey(autoGenerate = true)
     var id: Int? = null
 }

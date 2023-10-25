@@ -203,16 +203,20 @@ class TrackingFragment : Fragment(){
             for(pos in polyline)
                 bounds.include(pos)
 
-        try {
-            map?.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds.build(),binding.mapView.width,binding.mapView.height,(binding.mapView.height*0.5f).toInt() ))
-        }catch (e:Exception){
-            map?.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds.build(),300 ))
-        }
+        var distanceM = 0
+        for(polyline in pathPoints) distanceM+= getPolylineLength(polyline).toInt()
+        val distanceKM = (distanceM/1000f).toInt()
+        if(distanceKM>=1)
+            try {
+                map?.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds.build(),binding.mapView.width,binding.mapView.height,(binding.mapView.height*0.5f).toInt() ))
+            }catch (e:Exception){
+                map?.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds.build(),100 ))
+            }
     }
 
     private fun endRunAndSaveDb(){
         zoomOutForEntirePath()
-        val weight : Int =  appPreferences.getString(PREF_WEIGHT,"")?.toInt() ?: 65
+        val weight : Double=  appPreferences.getString(PREF_WEIGHT,"")?.toDoubleOrNull() ?: 65.0
         map?.snapshot {
             var distanceInMeters = 0
             for(polyline in pathPoints) distanceInMeters+= getPolylineLength(polyline).toInt()

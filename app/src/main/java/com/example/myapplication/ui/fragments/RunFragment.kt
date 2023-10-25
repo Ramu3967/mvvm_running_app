@@ -5,16 +5,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.myapplication.R
 import com.example.myapplication.adapters.RunAdapter
 import com.example.myapplication.databinding.FragmentRunBinding
 import com.example.myapplication.ui.viewmodels.MainViewModel
 import com.example.myapplication.util.RunConstants
 import com.example.myapplication.util.RunConstants.hasLocationPerm
+import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_INDEFINITE
+import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
@@ -26,7 +31,20 @@ class RunFragment : Fragment(), EasyPermissions.PermissionCallbacks{
     lateinit var locationPermissions:Array<String>
     private lateinit var binding:FragmentRunBinding
     private val viewModel: MainViewModel by viewModels()
-    private val runAdapter by lazy { RunAdapter(emptyList()) }
+    private val runAdapter by lazy { RunAdapter(emptyList()){run->
+        AlertDialog.Builder(requireContext())
+            .setTitle("Delete Run")
+            .setMessage("Are you sure you want to delete this run?")
+            .setPositiveButton("Yes") { _, _ ->
+                viewModel.deleteRun(run)
+                Snackbar.make(binding.root,"Deleted",LENGTH_LONG).apply {
+                    setAction(R.string.undo_deletion){viewModel.saveRunInDb(run)}
+                    show()
+                }
+            }
+            .setNegativeButton("No", null)
+            .show()
+    } }
 
     override fun onCreateView(
         inflater: LayoutInflater,
