@@ -23,9 +23,9 @@ interface RunDao {
     @Query("select * from table_run order by caloriesBurned desc")
     fun getAllRunsSortedByCalories(): LiveData<List<Run>>
     @Query("select * from table_run order by distanceInMeters desc")
-    fun getAllRunsSortedByDistance(): Flow<List<Run>>
+    fun getAllRunsSortedByDistance(): LiveData<List<Run>>
     @Query("select * from table_run order by timeInMillis desc")
-    fun getAllRunsSortedByTimeDuration(): Flow<List<Run>>
+    fun getAllRunsSortedByTimeDuration(): LiveData<List<Run>>
 
     @Query("select sum(timeInMillis) from table_run")
     fun getTotalTimeInMillis():Flow<Long>
@@ -39,4 +39,7 @@ interface RunDao {
     // get the raw data as they are added in the db
     @Query("select * from table_run where id = :id")
     fun getRuns(id:Int): List<Run>
+
+    @Query("select avg(avgSpeedInKmh) as avgSpeedInKmh,sum(distanceInMeters) as distanceInMeters,sum(timeInMillis) as timeInMillis,sum(caloriesBurned) as caloriesBurned, 0 as timestamp from table_run")
+    fun getSummary():Flow<Run>
 }

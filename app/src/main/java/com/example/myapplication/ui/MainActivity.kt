@@ -10,6 +10,7 @@ import com.example.myapplication.R
 import com.example.myapplication.databinding.ActivityMainBinding
 import com.example.myapplication.util.RunConstants.ACTION_TRACKING_FRAGMENT
 import com.example.myapplication.util.RunConstants.hide
+import com.example.myapplication.util.RunConstants.remove
 import com.example.myapplication.util.RunConstants.show
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -33,7 +34,7 @@ class MainActivity : AppCompatActivity() {
             navHostFragment.navController.addOnDestinationChangedListener { _, destination, _ ->
                 when(destination.id){
                     R.id.runFragment, R.id.statisticsFragment, R.id.settingsFragment -> bottomNavigationView.show()
-                    else->bottomNavigationView.hide()
+                    else->bottomNavigationView.remove()
                 }
             }
             // if this intent launches this activity

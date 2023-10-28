@@ -4,9 +4,14 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.location.Location
 import android.os.Build
 import android.view.View
+import android.widget.EditText
 import androidx.core.content.ContextCompat
+import com.example.myapplication.services.Polyline
+import com.example.myapplication.util.RunConstants.enable
+import com.google.android.material.textfield.TextInputEditText
 import pub.devrel.easypermissions.EasyPermissions
 
 object RunConstants {
@@ -23,22 +28,34 @@ object RunConstants {
     const val CHANNEL_NAME = "notification_channel_foreground_service"
     const val CHANNEL_ID = "id_foreground_service"
     const val NOTIFICATION_ID = 1
+    const val NOTIFICATION_TITLE = "Running App"
 
-    const val LOCATION_INTERVAL=2000L
-    const val LOCATION_FASTEST_INTERVAL = 1000L
-    const val LOCATION_MAX_WAIT_TIME = 10000L
+    const val LOCATION_INTERVAL=4000L
+    const val LOCATION_FASTEST_INTERVAL = 2000L
+    const val LOCATION_MAX_WAIT_TIME = 2000L
     const val LOCATION_PERMISSION_REQUEST_CODE = 911
 
     const val POLYLINE_WIDTH = 8f
     const val POLYLINE_COLOR = Color.BLACK
     const val POLYLINE_CAMERA_ZOOM = 16f
 
+    const val PREF_MY_APP = "com.example.myapplication.util.MY_APP"
+    const val PREF_USER_NAME = "com.example.myapplication.util.PREF_NAME"
+    const val PREF_WEIGHT = "com.example.myapplication.util.PREF_WEIGHT"
+    const val PREF_FIRST_TIME = "com.example.myapplication.util.PREF_FIRST_TIME"
+
+    const val EMPTY_STRING = ""
+
     val locationPermissions= mutableListOf(Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION)
         .apply {if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)}.toTypedArray()
+
+    enum class SortingOptions { DATE, TIME, DISTANCE, AVG_SPEED, CALORIES }
 
     fun View.show(){this.visibility=View.VISIBLE}
     fun View.remove(){this.visibility=View.GONE}
     fun View.hide(){this.visibility=View.INVISIBLE}
+    fun View.enable(){this.isEnabled=true}
+    fun View.disable(){this.isEnabled=false}
 
 
     fun Context.hasLocationPermissions() = locationPermissions.all {
@@ -61,5 +78,18 @@ object RunConstants {
         val millisecondsRemainder = milliseconds % 1000
         return String.format("%02d:%02d:%02d:%03d", hours, minutes, seconds, millisecondsRemainder)
     }
+
+    fun getPolylineLength(polyline:Polyline):Float{
+        var distance=0f
+        for(i in polyline.size-1 downTo 1 ){
+            val pos1=polyline[i]
+            val pos2=polyline[i-1]
+            val result = FloatArray(1)
+            Location.distanceBetween(pos1.latitude,pos1.longitude,pos2.latitude,pos2.longitude,result)
+            distance+=result[0]
+        }
+        return distance
+    }
+
 }
 

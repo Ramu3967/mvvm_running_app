@@ -7,6 +7,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class StatisticsViewModel @Inject constructor(
-    val mainRepository: MainRepository
+    private val mainRepository: MainRepository
 ): ViewModel() {
+    fun getSummary()=mainRepository.getSummary()
+    fun getRunsSortedByDate()=mainRepository.getAllRunsSortedByDate()
 }
